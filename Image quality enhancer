@@ -1,0 +1,39 @@
+import streamlit as st
+from PIL import Image, ImageEnhance
+import io
+
+def enhance_image(image, brightness_factor, contrast_factor, sharpness_factor):
+    # Adjust brightness
+    enhancer = ImageEnhance.Brightness(image)
+    image = enhancer.enhance(brightness_factor)
+
+    # Adjust contrast
+    enhancer = ImageEnhance.Contrast(image)
+    image = enhancer.enhance(contrast_factor)
+
+    # Adjust sharpness
+    enhancer = ImageEnhance.Sharpness(image)
+    image = enhancer.enhance(sharpness_factor)
+    
+    return image
+
+st.title("Image Quality Enhancer")
+
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption='Original Image', use_column_width=True)
+
+    # Sliders for adjustments
+    brightness_factor = st.slider("Brightness", 0.5, 3.0, 1.0)
+    contrast_factor = st.slider("Contrast", 0.5, 3.0, 1.0)
+    sharpness_factor = st.slider("Sharpness", 0.5, 3.0, 1.0)
+    
+    if st.button('Apply Enhancements'):
+        enhanced_image = enhance_image(image, brightness_factor, contrast_factor, sharpness_factor)
+
+        # To display enhanced image
+        img_byte_arr = io.BytesIO()
+        enhanced_image.save(img_byte_arr, format=image.format)
+        img_byte_arr = img_byte_arr.getvalue()
+        st.image(img_byte_arr, caption='Enhanced Image', use_column_width=True)
